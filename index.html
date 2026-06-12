@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemical Toxicity Analyzer | Interactive Learning Platform</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style1.css') }}">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- HEADER -->
+        <header class="hero-header">
+            <canvas id="particles-canvas"></canvas>
+            <div class="header-bg"></div>
+            <div class="header-content">
+                <h1><i class="fas fa-flask"></i> Chemical Toxicity Analyzer</h1>
+                <p class="tagline">Interactive Learning Platform for Chemical Safety & Environmental Impact</p>
+            </div>
+            <div class="header-controls">
+                <button class="theme-toggle" onclick="playSound('click');toggleTheme()" title="Toggle Dark/Light Mode">
+                    <span id="theme-icon">🌙</span>
+                </button>
+                <button class="sound-toggle" onclick="playSound('click');toggleSound()" title="Toggle Sound Effects"
+                    id="sound-btn">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- QUICK ACTIONS -->
+        <div class="quick-actions">
+            <button class="action-btn" onclick="showQuizModal()">
+                <i class="fas fa-question-circle"></i>
+                <span>Take Quiz</span>
+            </button>
+            <button class="action-btn" onclick="showLearnMode()">
+                <i class="fas fa-book-open"></i>
+                <span>Learn Mode</span>
+            </button>
+            <button class="action-btn" onclick="showSafetyGuide()">
+                <i class="fas fa-shield-alt"></i>
+                <span>Safety Guide</span>
+            </button>
+            <button class="action-btn" onclick="showEmergencyModal()">
+                <i class="fas fa-bell"></i>
+                <span>Emergency</span>
+            </button>
+            <button class="action-btn" onclick="showUnitConverter()">
+                <i class="fas fa-calculator"></i>
+                <span>Converter</span>
+            </button>
+            <button class="action-btn" onclick="showGlossary()">
+                <i class="fas fa-book"></i>
+                <span>Glossary</span>
+            </button>
+            <button class="action-btn" onclick="showCaseStudies()">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Case Studies</span>
+            </button>
+            <button class="action-btn" onclick="showVideos()">
+                <i class="fas fa-video"></i>
+                <span>Videos</span>
+            </button>
+        </div>
+
+        <!-- CHEMICAL CARDS GRID -->
+        <section class="section-header">
+            <h2><i class="fas fa-atom"></i> Explore Chemicals</h2>
+            <p>Click on any card to view detailed analysis</p>
+        </section>
+
+        <div class="chemical-grid" id="chemical-grid">
+            <!-- Cards populated by JS -->
+        </div>
+
+        <!-- SELECT + ANALYZE -->
+        <div class="card select-card">
+            <h3><i class="fas fa-search"></i> Detailed Analysis</h3>
+            <form id="analysis-form">
+                <select id="chemical-select">
+                    <option value="">Select a chemical...</option>
+                </select>
+                <button type="submit" class="btn-primary"><i class="fas fa-chart-bar"></i> Analyze</button>
+            </form>
+
+            <div id="loading" class="hidden">
+                <div class="skeleton-loader">
+                    <div class="skeleton-line w-70"></div>
+                    <div class="skeleton-line w-100"></div>
+                    <div class="skeleton-line w-40"></div>
+                    <div class="skeleton-card"></div>
+                </div>
+                <span>Analyzing chemical data...</span>
+            </div>
+            <div id="error" class="hidden error-box"></div>
+        </div>
+
+        <!-- RESULTS -->
+        <div id="results" class="hidden result-box">
+            <div class="result-header">
+                <h2><i class="fas fa-clipboard-check"></i> Analysis Results</h2>
+                <div class="result-actions">
+                    <button class="btn-secondary" onclick="printResult()"><i class="fas fa-print"></i> Print</button>
+                    <button class="btn-secondary" onclick="exportResult()"><i class="fas fa-copy"></i> Export</button>
+                    <button class="btn-secondary" onclick="shareResult()"><i class="fas fa-share"></i> Share</button>
+                </div>
+            </div>
+
+            <div class="image-info-grid">
+                <div class="image-container">
+                    <img id="chemical-image" class="chemical-img" src="" alt="Chemical Image">
+                    <div id="toxicity-badge" class="toxicity-badge"></div>
+                </div>
+                <div id="chemical-info" class="info-panel"></div>
+            </div>
+
+            <div id="chemical-quote" class="chemical-quote"></div>
+
+            <!-- Safety Tips -->
+            <div id="safety-tips" class="safety-tips"></div>
+
+            <!-- Detailed Tabs -->
+            <div class="detail-tabs">
+                <button class="tab-btn active" onclick="showTab('overview')">Overview</button>
+                <button class="tab-btn" onclick="showTab('safety')">Safety</button>
+                <button class="tab-btn" onclick="showTab('environmental')">Environmental</button>
+            </div>
+
+            <div id="tab-content" class="tab-content"></div>
+        </div>
+
+        <!-- GLOBAL CHARTS -->
+        <section class="section-header">
+            <h2><i class="fas fa-chart-line"></i> Comparative Analysis</h2>
+            <p>Visual comparison of all chemicals in our database</p>
+        </section>
+
+        <div class="global-charts">
+            <h3>Safety vs Hazard Level</h3>
+            <div class="chart-box">
+                <canvas id="safety-hazard-chart"></canvas>
+            </div>
+
+            <h3>Safety Radar Comparison</h3>
+            <div class="chart-box">
+                <canvas id="safety-level-chart"></canvas>
+            </div>
+
+            <h3>Toxicity Comparison</h3>
+            <div class="chart-box">
+                <canvas id="all-toxicity-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- RECENT SEARCHES -->
+        <div class="card recent-searches">
+            <h3><i class="fas fa-history"></i> Recent Analyses</h3>
+            <div id="recent-list" class="recent-list"></div>
+        </div>
+
+        <!-- COMPARE -->
+        <div class="card compare-section">
+            <h3><i class="fas fa-random"></i> Compare Chemicals</h3>
+            <div class="compare-controls">
+                <select id="chem1">
+                    <option value="">Select Chemical 1</option>
+                </select>
+                <span class="vs-badge">VS</span>
+                <select id="chem2">
+                    <option value="">Select Chemical 2</option>
+                </select>
+            </div>
+            <button class="btn-primary" onclick="compareChemicals()"><i class="fas fa-exchange-alt"></i> Compare
+                Now</button>
+        </div>
+
+    </div>
+
+    <!-- CHATBOT -->
+    <div class="chatbot" id="chatbot">
+        <div class="chatbot-header" onclick="toggleChatbot()">
+            <h3><i class="fas fa-robot"></i> AI Assistant</h3>
+            <span id="chatbot-toggle" class="toggle-icon">▼</span>
+        </div>
+
+        <div id="chat-body" class="chat-body">
+            <div id="chat-box"></div>
+
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" placeholder="Ask about chemicals...">
+                <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+    <div id="compare-result" class="compare-container hidden"></div>
+
+    <!-- QUIZ MODAL -->
+    <div id="quiz-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeQuizModal()">&times;</span>
+            <h2><i class="fas fa-question-circle"></i> Chemical Safety Quiz</h2>
+            <div id="quiz-content"></div>
+        </div>
+    </div>
+
+    <!-- EMERGENCY MODAL -->
+    <div id="emergency-modal" class="modal hidden">
+        <div class="modal-content modal-wide">
+            <span class="modal-close" onclick="closeEmergencyModal()">&times;</span>
+            <h2><i class="fas fa-bell"></i> Emergency Procedures</h2>
+            <div id="emergency-content"></div>
+        </div>
+    </div>
+
+    <!-- UNIT CONVERTER MODAL -->
+    <div id="converter-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeConverterModal()">&times;</span>
+            <h2><i class="fas fa-calculator"></i> Unit Converter</h2>
+            <div class="converter-body">
+                <div class="converter-input">
+                    <label>Enter Value:</label>
+                    <input type="number" id="convert-value" placeholder="e.g., 100" oninput="convertUnit()">
+                </div>
+                <div class="converter-input">
+                    <label>From:</label>
+                    <select id="convert-from" onchange="convertUnit()">
+                        <option value="mgkg">mg/kg (LD50)</option>
+                        <option value="ppm">ppm</option>
+                        <option value="mgl">mg/L</option>
+                        <option value="percent">%</option>
+                    </select>
+                </div>
+                <div class="converter-arrow"><i class="fas fa-arrow-down"></i></div>
+                <div class="converter-result">
+                    <label>Result:</label>
+                    <div id="convert-result" class="result-box">0</div>
+                </div>
+                <p class="converter-note">Note: Conversions are approximate based on typical assumptions.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- GLOSSARY MODAL -->
+    <div id="glossary-modal" class="modal hidden">
+        <div class="modal-content modal-wide">
+            <span class="modal-close" onclick="closeGlossary()">&times;</span>
+            <h2><i class="fas fa-book"></i> Glossary of Terms</h2>
+            <div class="glossary-content">
+                <div class="glossary-item">
+                    <h4>LD50 (Lethal Dose 50%)</h4>
+                    <p>The dose at which 50% of test subjects die. Lower = more toxic. Measured in mg/kg body weight.
+                    </p>
+                </div>
+                <div class="glossary-item">
+                    <h4>Toxicity</h4>
+                    <p>The degree to which a substance can damage an organism.</p>
+                </div>
+                <div class="glossary-item">
+                    <h4>Bioaccumulation</h4>
+                    <p>When a chemical builds up in an organism faster than it can be eliminated.</p>
+                </div>
+                <div class="glossary-item">
+                    <h4>Environmental Persistence</h4>
+                    <p>How long a chemical lasts in the environment before breaking down.</p>
+                </div>
+                <div class="glossary-item">
+                    <h4>Carcinogen</h4>
+                    <p>A substance that can cause cancer in living tissue.</p>
+                </div>
+                <div class="glossary-item">
+                    <h4>Neurotoxin</h4>
+                    <p>A substance that specifically damages the nervous system.</p>
+                </div>
+                <div class="glossary-item">
+                    <h4> ppm (parts per million)</h4>
+                    <p>A unit of concentration. 1 ppm = 1 mg per liter of water.</p>
+                </div>
+                <div class="glossary-item">
+                    <h4>GHS Classification</h4>
+                    <p>Globally Harmonized System for classifying chemicals by hazard type.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CASE STUDIES MODAL -->
+    <div id="cases-modal" class="modal hidden">
+        <div class="modal-content modal-wide">
+            <span class="modal-close" onclick="closeCasesModal()">&times;</span>
+            <h2><i class="fas fa-exclamation-triangle"></i> Real-World Case Studies</h2>
+            <div class="case-studies">
+                <div class="case-item">
+                    <h4><i class="fas fa-flask"></i> Minamata Disease (Japan, 1956)</h4>
+                    <p><strong>Chemical:</strong> Methylmercury</p>
+                    <p>Chisso Corporation dumped mercury into Minamata Bay. Over 2,000 people were poisoned, many with
+                        permanent neurological damage. This disaster led to strict environmental regulations in Japan.
+                    </p>
+                </div>
+                <div class="case-item">
+                    <h4><i class="fas fa-flask"></i> Bhopal Disaster (India, 1984)</h4>
+                    <p><strong>Chemical:</strong> Methyl isocyanate</p>
+                    <p>Union Carbide plant leaked 42 tons of toxic gas, killing 16,000+ people immediately and causing
+                        500,000 injuries. It remains the deadliest industrial disaster in history.</p>
+                </div>
+                <div class="case-item">
+                    <h4><i class="fas fa-flask"></i> Flint Water Crisis (USA, 2014)</h4>
+                    <p><strong>Chemical:</strong> Lead</p>
+                    <p>Corrosive water leached lead from old pipes into drinking water. 100,000 residents exposed. Led
+                        to criminal charges and massive infrastructure overhaul.</p>
+                </div>
+                <div class="case-item">
+                    <h4><i class="fas fa-flask"></i> Deepwater Horizon (USA, 2010)</h4>
+                    <p><strong>Chemical:</strong> Crude Oil/Benzene</p>
+                    <p>BP oil rig explosion killed 11 workers and spilled 134 million gallons of oil. Marine life
+                        devastated across the Gulf of Mexico ecosystem.</p>
+                </div>
+                <div class="case-item">
+                    <h4><i class="fas fa-flask"></i> Love Canal (USA, 1978)</h4>
+                    <p><strong>Chemical:</strong> Dioxin, Various Industrial Waste</p>
+                    <p>87 homes built on former toxic waste dump. Families exposed to 200+ toxic chemicals. Evacuation
+                        of 900 people. Birth defect rates 3x higher than normal.</p>
+                </div>
+                <div class="case-item">
+                    <h4><i class="fas fa-flask"></i> Seveso Disaster (Italy, 1976)</h4>
+                    <p><strong>Chemical:</strong> TCDD (Dioxin)</p>
+                    <p>Chemical plant explosion released dioxin cloud over 18,000 residents. Animals died, children
+                        suffered chloracne. Led to EU Seveso Directive for industrial safety.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIDEOS MODAL -->
+    <div id="videos-modal" class="modal hidden">
+        <div class="modal-content modal-wide">
+            <span class="modal-close" onclick="closeVideosModal()">&times;</span>
+            <h2><i class="fas fa-video"></i> Safety & Educational Videos</h2>
+            <div class="video-grid">
+                <div class="video-item">
+                    <h4>Chemical Safety Basics</h4>
+                    <p>Learn the fundamentals of handling chemicals safely in any laboratory or industrial setting.</p>
+                    <div class="video-embed">
+                        <iframe src="https://www.youtube.com/embed/ooVXDYzrMA8" allowfullscreen></iframe>
+                    </div>
+                </div>
+                <div class="video-item">
+                    <h4>Understanding LD50 Values</h4>
+                    <p>How toxicologists measure and interpret lethal dose information for chemical safety.</p>
+                    <div class="video-embed">
+                        <iframe src="https://www.youtube.com/embed/rR66J2wd7l4" allowfullscreen></iframe>
+                    </div>
+                </div>
+                <div class="video-item">
+                    <h4>PPE: Personal Protective Equipment</h4>
+                    <p>Essential protective gear every chemical handler must use to stay safe.</p>
+                    <div class="video-embed">
+                        <iframe src="https://www.youtube.com/embed/p_9hOqdw75o" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+
+<footer>
+    <p>&copy; 2026 Akansha Singhal. All rights reserved. Built with care.</p>
+</footer>
+
+</html>
