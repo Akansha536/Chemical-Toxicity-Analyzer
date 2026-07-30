@@ -27,7 +27,7 @@ A web application that predicts the toxicity of chemical compounds using machine
 ## 📸 Application Screenshots
 
 ### 1. Home Page
-![Home Page](screenshots/Screenshot_2026-07-30_12-53-05.png)
+![Home Page](screenshots/Home.png)
 
 ### 2. Input Form
 ![Input Form](screenshots/Screenshot_2026-07-30_12-53-22.png)
