@@ -3,8 +3,8 @@
 ### Home Page
 ![Home](screenshots/Home.png)
 
-### Prediction
-![Prediction](screenshots/prediction.png)
+### Graphs
+![Prediction](screenshots/Graphs.png)
 
 ### Results
 ![Results](screenshots/result.png)
